@@ -21,5 +21,12 @@ class Lightswitch:
         self.mutex.unlock()
 
 
+class SharedData:
+    def __init__(self):
+        self.switch = Lightswitch()
+        self.flag = Semaphore(1)
+        self.readers = 0
+
+
 if __name__ == '__main__':
-    ls = Lightswitch()
+    pass
