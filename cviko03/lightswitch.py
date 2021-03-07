@@ -35,33 +35,40 @@ class SharedData:
 
 def writer_thread(thread_id, shared):
     while True:
+        # stop if process is finished (for testing purposes)
         if shared.finished_flag:
             break
         shared.turnstile.wait()
         sleep(randint(0, 10) / 10)
         print(f'{thread_id} before wait...')
         shared.semaphore.wait()
-        # priemerna dlzka zapisu - 0.5s
+
+        # average write time - 0.5s
         sleep(randint(0, 10) / 10)
         shared.semaphore.signal()
         shared.turnstile.signal()
         print(f'{thread_id} after wait...')
+        # increase number of successful writes
         shared.n_writes += 1
 
 
 def reader_thread(thread_id, shared: SharedData):
     while True:
+        # stop if process is finished (for testing purposes)
         if shared.finished_flag:
             break
         shared.turnstile.wait()
         shared.turnstile.signal()
+
         sleep(randint(0, 10) / 10)
         print(f'{thread_id} before wait...')
         shared.switch.lock(shared.semaphore)
-        # priemerna dlzka citania - 0.5s
+
+        # average read time - 0.5s
         sleep(randint(0, 10) / 10)
         shared.switch.unlock(shared.semaphore)
         print(f'{thread_id} after wait...')
+        # increase number of successful reads
         shared.n_reads += 1
 
 
