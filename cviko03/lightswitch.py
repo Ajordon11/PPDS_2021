@@ -40,16 +40,16 @@ def writer_thread(thread_id, shared):
             break
         shared.turnstile.wait()
         sleep(randint(0, 10) / 10)
-        print(f'{thread_id} before wait...')
         shared.semaphore.wait()
 
         # average write time - 0.5s
         sleep(randint(0, 10) / 10)
         shared.semaphore.signal()
         shared.turnstile.signal()
-        print(f'{thread_id} after wait...')
+
         # increase number of successful writes
         shared.n_writes += 1
+        print(f'{thread_id} after write, n.{shared.n_writes}')
 
 
 def reader_thread(thread_id, shared: SharedData):
@@ -61,15 +61,15 @@ def reader_thread(thread_id, shared: SharedData):
         shared.turnstile.signal()
 
         sleep(randint(0, 10) / 10)
-        print(f'{thread_id} before wait...')
         shared.switch.lock(shared.semaphore)
 
         # average read time - 0.5s
         sleep(randint(0, 10) / 10)
         shared.switch.unlock(shared.semaphore)
-        print(f'{thread_id} after wait...')
+
         # increase number of successful reads
         shared.n_reads += 1
+        print(f'{thread_id} after read, n.{shared.n_reads}')
 
 
 if __name__ == '__main__':
