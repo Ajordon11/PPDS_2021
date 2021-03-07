@@ -28,10 +28,15 @@ class SharedData:
         self.switch = Lightswitch()
         self.semaphore = Semaphore(1)
         self.turnstile = Semaphore(1)
+        self.n_reads = 0
+        self.n_writes = 0
+        self.finished_flag = False
 
 
 def writer_thread(thread_id, shared):
     while True:
+        if shared.finished_flag:
+            break
         shared.turnstile.wait()
         sleep(randint(0, 10) / 10)
         print(f'{thread_id} before wait...')
@@ -41,10 +46,13 @@ def writer_thread(thread_id, shared):
         shared.semaphore.signal()
         shared.turnstile.signal()
         print(f'{thread_id} after wait...')
+        shared.n_writes += 1
 
 
 def reader_thread(thread_id, shared: SharedData):
     while True:
+        if shared.finished_flag:
+            break
         shared.turnstile.wait()
         shared.turnstile.signal()
         sleep(randint(0, 10) / 10)
@@ -54,6 +62,7 @@ def reader_thread(thread_id, shared: SharedData):
         sleep(randint(0, 10) / 10)
         shared.switch.unlock(shared.semaphore)
         print(f'{thread_id} after wait...')
+        shared.n_reads += 1
 
 
 if __name__ == '__main__':
