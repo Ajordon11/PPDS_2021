@@ -13,8 +13,12 @@ class Lightswitch:
             semaphore.wait()
         self.mutex.unlock()
 
-    def unlock(self):
-        pass
+    def unlock(self, semaphore: Semaphore()):
+        self.mutex.lock()
+        self.counter -= 1
+        if self.counter == 0:
+            semaphore.signal()
+        self.mutex.unlock()
 
 
 if __name__ == '__main__':
