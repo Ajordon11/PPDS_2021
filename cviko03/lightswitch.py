@@ -49,7 +49,7 @@ def writer_thread(thread_id, shared):
 
         # increase number of successful writes
         shared.n_writes += 1
-        print(f'{thread_id} after write, n.{shared.n_writes}')
+        # print(f'{thread_id} after write, n.{shared.n_writes}')
 
 
 def reader_thread(thread_id, shared: SharedData):
@@ -69,13 +69,30 @@ def reader_thread(thread_id, shared: SharedData):
 
         # increase number of successful reads
         shared.n_reads += 1
-        print(f'{thread_id} after read, n.{shared.n_reads}')
+        # print(f'{thread_id} after read, n.{shared.n_reads}')
+
+
+def stop_thread(time, shared: SharedData):
+    sleep(time)
+    shared.finished_flag = True
+    print(f'killed threads, results-> reads: {shared.n_reads}, writes: {shared.n_writes}')
+    shared.n_writes = 0
+    shared.n_reads = 0
 
 
 if __name__ == '__main__':
     data = SharedData()
-    threads = []
+    max_writers = 20
+    n_readers = 30
 
-    for i in range(10):
-        threads.append(Thread(reader_thread, f'Reader n.{i}', data))
-    threads.append(Thread(writer_thread, f'Writer', data))
+    for i in range(max_writers):
+        threads = []
+        data.finished_flag = False
+        for j in range(n_readers):
+            threads.append(Thread(reader_thread, f'Reader n.{j}', data))
+
+        for k in range(i):
+            threads.append(Thread(writer_thread, f'Writer n.{k}', data))
+        threads.append(Thread(stop_thread, 5, data))
+        for t in threads:
+            t.join()
