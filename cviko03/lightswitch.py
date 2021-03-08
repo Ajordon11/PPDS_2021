@@ -32,6 +32,8 @@ class SharedData:
         self.n_writes = 0
         self.finished_flag = False
         self.mutex = Mutex()
+        self.results_reads = []
+        self.results_writes = []
 
 
 def writer_thread(thread_id, shared):
@@ -80,7 +82,10 @@ def reader_thread(thread_id, shared: SharedData):
 def stop_thread(time, shared: SharedData):
     sleep(time)
     shared.finished_flag = True
-    print(f'killed threads, results-> reads: {shared.n_reads}, writes: {shared.n_writes}')
+    print(f'immediate results-> reads: {shared.n_reads},'
+          f' writes: {shared.n_writes}')
+    shared.results_reads.append(shared.n_reads)
+    shared.results_writes.append(shared.n_writes)
     shared.n_writes = 0
     shared.n_reads = 0
 
@@ -88,7 +93,7 @@ def stop_thread(time, shared: SharedData):
 if __name__ == '__main__':
     data = SharedData()
     max_writers = 20
-    n_readers = 30
+    n_readers = 10
 
     for i in range(max_writers):
         threads = []
@@ -96,8 +101,11 @@ if __name__ == '__main__':
         for j in range(n_readers):
             threads.append(Thread(reader_thread, f'Reader n.{j}', data))
 
-        for k in range(i):
+        for k in range(1, i + 1):
             threads.append(Thread(writer_thread, f'Writer n.{k}', data))
-        threads.append(Thread(stop_thread, 5, data))
+        threads.append(Thread(stop_thread, 1, data))
         for t in threads:
             t.join()
+
+    print(f'final reads: {data.results_reads}')
+    print(f'final writes: {data.results_writes}')
