@@ -1,3 +1,23 @@
+"""
+todo
+Cvicenie 3 - Problem Citatelia-Zapisovatelia pomocou ADT Lightswitch
+
+Implementacia:
+
+
+Odpovede:
+    5. Pre aký počet čitateľov s danou priemernou dobou čítania
+     sa prejavuje problém vyhladovenia?
+     -
+
+    7. Je možné, aby sa prejavilo vyhladovenie aj u čitateľov?
+     -
+
+    9. Pre daný počet čitateľov, priemernú dobu čítania, priemernú dobu
+     zápisu vieme určit optimálny počet zapisovateľov?
+     -
+"""
+
 from time import sleep
 from random import randint
 from fei.ppds import Mutex, Semaphore, Thread, print
