@@ -31,6 +31,7 @@ class SharedData:
         self.n_reads = 0
         self.n_writes = 0
         self.finished_flag = False
+        self.mutex = Mutex()
 
 
 def writer_thread(thread_id, shared):
@@ -48,7 +49,9 @@ def writer_thread(thread_id, shared):
         shared.turnstile.signal()
 
         # increase number of successful writes
+        shared.mutex.lock()
         shared.n_writes += 1
+        shared.mutex.unlock()
         # print(f'{thread_id} after write, n.{shared.n_writes}')
 
 
@@ -68,7 +71,9 @@ def reader_thread(thread_id, shared: SharedData):
         shared.switch.unlock(shared.semaphore)
 
         # increase number of successful reads
+        shared.mutex.lock()
         shared.n_reads += 1
+        shared.mutex.unlock()
         # print(f'{thread_id} after read, n.{shared.n_reads}')
 
 
