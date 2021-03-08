@@ -1,6 +1,7 @@
 from time import sleep
 from random import randint
 from fei.ppds import Mutex, Semaphore, Thread, print
+import matplotlib.pyplot as plt
 
 
 class Lightswitch:
@@ -90,6 +91,18 @@ def stop_thread(time, shared: SharedData):
     shared.n_reads = 0
 
 
+def plot(reads: list, writes: list, writers):
+    plt.figure()
+    ax = plt.axes(projection='3d')
+    ax.set_xlabel('Pocet zapisovatelov')
+    ax.set_ylabel('Pocet zapisov')
+    ax.set_zlabel('Pocet citani')
+    # writers are incremented by 1
+    x = list(range(1, writers + 1))
+    ax.plot_trisurf(x, writes, reads, cmap='viridis', edgecolor='none')
+    plt.show()
+
+
 if __name__ == '__main__':
     data = SharedData()
     max_writers = 20
@@ -109,3 +122,4 @@ if __name__ == '__main__':
 
     print(f'final reads: {data.results_reads}')
     print(f'final writes: {data.results_writes}')
+    plot(data.results_reads, data.results_writes, max_writers)
