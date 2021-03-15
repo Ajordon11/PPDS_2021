@@ -29,6 +29,7 @@ class Shared:
     def __init__(self):
         self.accessData = Semaphore(1)
         self.turnstile = Semaphore(1)
+        self.ls_monitor = LightswitchMod()
         self.ls_cidlo = LightswitchMod()
         self.validData = Semaphore(0)
 
@@ -55,13 +56,30 @@ def cidlo(shared, cidlo_id, typ):
             shared.validData.signal(8)
         print(
             f'cidlo {cidlo_id}:  pocet_zapisujucich_cidiel={num_active_sensors}, '
-            f'trvanie_zapisu={write_time} typ {typ}')
+            f'trvanie_zapisu={write_time} typ {typ}'
+        )
         sleep(write_time)
         shared.ls_cidlo.unlock(shared.accessData)
 
 
 def monitor(shared, monitor_id):
-    pass
+    while True:
+        # block until sensors are finished
+        shared.validData.wait()
+        shared.turnstile.wait()
+
+        # get number of active monitors (current counter in Lightswitch)
+        num_active_monitors = shared.ls_monitor.lock(shared.accessData)
+
+        shared.turnstile.signal()
+        # simulate data access
+        read_time = randint(40, 50) / 1000
+        print(
+            f'monit {monitor_id}: pocet_citajucich_monitorov={num_active_monitors} '
+            f'trvanie_citania:{read_time}'
+        )
+        sleep(read_time)
+        shared.ls_monitor.unlock(shared.accessData)
 
 
 if __name__ == '__main__':
