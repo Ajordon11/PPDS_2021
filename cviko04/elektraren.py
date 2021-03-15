@@ -11,7 +11,7 @@ class LightswitchMod:
         self.counter += 1
         if self.counter == 1:
             semaphore.wait()
-            current = self.counter
+        current = self.counter
         self.mutex.unlock()
         return current
 
