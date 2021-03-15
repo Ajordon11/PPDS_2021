@@ -1,21 +1,33 @@
 """
-todo
 Cvicenie 3 - Problem Citatelia-Zapisovatelia pomocou ADT Lightswitch
 
 Implementacia:
-
+    - jednotlivé metódy vlákien zapisovania a čítania sa automaticky ukončia
+      v prípade, že v zdieľanom objekte nastane ukončenie činnosti (nastavenie
+      finished_flag na True)
+    - v hlavnom tele programu sa postupne spúšťa rovnaký proces s daným počtom
+      čitateľov a postupne rastúcim počtom zapisovateľov
+    - spolu s pracujúcimi vláknami sa spustí aj kontrolné vlákno, ktoré po danom čase (1s)
+      nastaví ukončovací flag na True a zozbiera výsledky (počet úspešných zápisov a
+      čítaní)
 
 Odpovede:
     5. Pre aký počet čitateľov s danou priemernou dobou čítania
      sa prejavuje problém vyhladovenia?
-     -
+     - závisí od počtu zapisovateľov
+     - pri danej implementácii sa vyhladovanie prejavuje len u zapisovateľov
+       a to vtedy, ked je počet čitateľov aspoň 1.5x väčší ako zapisovateľov
 
     7. Je možné, aby sa prejavilo vyhladovenie aj u čitateľov?
-     -
+     - nie pri súčasnej implementácii, pretože sú uprednostňovaní pred zapisovateľmi,
+       ktorí čakajú na semafore
 
     9. Pre daný počet čitateľov, priemernú dobu čítania, priemernú dobu
      zápisu vieme určit optimálny počet zapisovateľov?
-     -
+     - v danej implementácii je počet čitateľov daný na 10, priemerná doba čítania
+       aj zápisu je 0.5s (0.1 - 1s)
+     - optimálny počet zapisovateľov je podobný ako počet čitateľov, pri čom nepomer
+       v neprospech zapisovateľov (viac ako 2-násobný) vedie k vyhladoveniu
 """
 
 from time import sleep
