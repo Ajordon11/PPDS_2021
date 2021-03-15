@@ -41,7 +41,7 @@ def cidlo(shared, cidlo_id, typ):
         shared.turnstile.wait()
         shared.turnstile.signal()
 
-        # get number of active monitors (current counter in Lightswitch)
+        # get number of active sensors (current counter in Lightswitch)
         num_active_sensors = shared.ls_cidlo.lock(shared.accessData)
 
         # write time according to assignment
@@ -60,7 +60,7 @@ def cidlo(shared, cidlo_id, typ):
         shared.ls_cidlo.unlock(shared.accessData)
 
 
-def monitor():
+def monitor(shared, monitor_id):
     pass
 
 
