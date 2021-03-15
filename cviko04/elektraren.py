@@ -1,3 +1,7 @@
+"""
+Cvicenie 4 - Atomova elektraren 2
+"""
+
 from time import sleep
 
 from fei.ppds import Mutex, Semaphore, randint, Thread, print
