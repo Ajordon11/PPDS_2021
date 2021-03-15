@@ -83,4 +83,9 @@ def monitor(shared, monitor_id):
 
 
 if __name__ == '__main__':
-    pass
+    num_sensors = 3
+    num_monitors = 8
+    shared_data = Shared()
+    sensor_types = ['P', 'T', 'H']
+    monitory = [Thread(monitor, shared_data, i) for i in range(num_monitors)]
+    sensors = [Thread(cidlo, shared_data, i, sensor_types[i]) for i in range(num_sensors)]
