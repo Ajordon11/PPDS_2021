@@ -13,9 +13,9 @@ Preto ich nedavame do zdielaneho objektu.
     n_savages - pocet divochov v kmeni (kuchara nepocitame).
     n_cooks - pocet kucharov
 """
-n_servings = 2
-n_savages = 3
-n_cooks = 3
+n_servings = 5
+n_savages = 12
+n_cooks = 7
 
 
 class SimpleBarrier:
@@ -95,12 +95,11 @@ def savage(savage_id, shared):
         alebo jednu zlozenu, ale kvoli prehladnosti vypisov
         sme sa rozhodli pre toto riesenie.
         """
-
         shared.barrier1.wait(
-            "divoch %2d: prisiel som na veceru, uz nas je %2d",
+            f'divoch %2d: prisiel som na veceru, uz nas je %2d',
             savage_id,
             print_each_thread=True)
-        shared.barrier2.wait("divoch %2d: uz sme vsetci, zaciname vecerat",
+        shared.barrier2.wait(f'divoch %2d: uz sme vsetci',
                              savage_id,
                              print_last_thread=True)
 
@@ -110,29 +109,35 @@ def savage(savage_id, shared):
               (savage_id, shared.servings))
         if shared.servings == 0:
             print("divoch %2d: budim kuchara" % savage_id)
-            shared.empty_pot.signal()
+            shared.empty_pot.signal(n_cooks)
             shared.full_pot.wait()
+        shared.cook_mutex.lock()
         get_serving_from_pot(savage_id, shared)
+        shared.cook_mutex.unlock()
         shared.mutex.unlock()
-
         eat(savage_id)
 
 
-def put_servings_in_pot(M, shared):
+def put_servings_in_pot(cook_id, shared):
     """
     Hrniec je reprezentovany zdielanou premennou servings.
     Ta udrziava informaciu o tom, kolko porcii je v hrnci k dispozicii.
     """
 
-    print("kuchar: varim")
+    print(f'kuchar {cook_id}: varim')
     # navarenie jedla tiez cosi trva...
     sleep(0.4 + randint(0, 2) / 10)
     shared.cook_mutex.lock()
-    shared.servings += M
+    if shared.servings >= n_servings:
+        print(f'kuchar {cook_id}: vidi ze uz je plno a jedia, tak ide prec')
+        shared.cook_mutex.unlock()
+        return
+    shared.servings += 1
+    print(f'kuchar {cook_id}: navaril, pocet porcii v hrnci: {shared.servings}')
     shared.cook_mutex.unlock()
 
 
-def cook(M, shared):
+def cook(id,  shared):
     """
     Na strane kuchara netreba robit ziadne modifikacie kodu.
     Riesenie je standardne podla prednasky.
@@ -143,21 +148,25 @@ def cook(M, shared):
 
     while True:
         shared.empty_pot.wait()
-        put_servings_in_pot(M, shared)
-        shared.full_pot.signal()
+        put_servings_in_pot(id, shared)
+        if shared.servings == n_servings:
+            print(f'kuchar {id}: vidi ze hrniec je plny a vola divochov')
+            shared.full_pot.signal()
+        else:
+            shared.empty_pot.signal(n_cooks)
 
 
-def init_and_run(N, M, C):
+def init_and_run(savages, servings, cooks):
     """
     Spustenie modelu
     """
     threads = list()
     shared = Shared()
-    for savage_id in range(0, N):
+    for savage_id in range(0, savages):
         threads.append(Thread(savage, savage_id, shared))
 
-    for cook_id in range(0, C):
-        threads.append(Thread(cook, cook_id, shared))
+    for cook_id in range(0, cooks):
+        threads.append(Thread(cook, cook_id, servings, shared))
 
     for t in threads:
         t.join()
