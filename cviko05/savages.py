@@ -124,7 +124,7 @@ def savage(savage_id, shared):
         eat(savage_id)
 
 
-def put_servings_in_pot(cook_id, shared):
+def put_servings_in_pot(cook_id, max, shared):
     """
     Hrniec je reprezentovany zdielanou premennou servings.
     Ta udrziava informaciu o tom, kolko porcii je v hrnci k dispozicii.
@@ -134,7 +134,7 @@ def put_servings_in_pot(cook_id, shared):
     # navarenie jedla tiez cosi trva...
     sleep(0.4 + randint(0, 2) / 10)
     shared.cook_mutex.lock()
-    if shared.servings >= n_servings or shared.eating:
+    if shared.servings >= max or shared.eating:
         print(f'kuchar {cook_id}: vidi ze uz je plno a jedia, tak ide prec')
         shared.cook_mutex.unlock()
         return
@@ -143,7 +143,7 @@ def put_servings_in_pot(cook_id, shared):
     shared.cook_mutex.unlock()
 
 
-def cook(id,  shared):
+def cook(id, max_servings, shared):
     """
     Na strane kuchara netreba robit ziadne modifikacie kodu.
     Riesenie je standardne podla prednasky.
@@ -154,8 +154,8 @@ def cook(id,  shared):
 
     while True:
         shared.empty_pot.wait()
-        put_servings_in_pot(id, shared)
-        if shared.servings == n_servings and not shared.eating:
+        put_servings_in_pot(id, max_servings, shared)
+        if shared.servings == max_servings and not shared.eating:
             print(f'kuchar {id}: vidi ze hrniec je plny a vola divochov')
             shared.full_pot.signal()
         else:
