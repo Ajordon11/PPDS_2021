@@ -66,6 +66,7 @@ class Shared:
         self.empty_pot = Semaphore(0)
         self.barrier1 = SimpleBarrier(n_savages)
         self.barrier2 = SimpleBarrier(n_savages)
+        self.eating = False
 
 
 def get_serving_from_pot(savage_id, shared):
