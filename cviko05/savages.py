@@ -7,13 +7,13 @@ from random import randint
 from time import sleep
 
 """
-M a N su parametre modelu, nie synchronizacie ako takej.
+Parametre modelu, nie synchronizacie ako takej.
 Preto ich nedavame do zdielaneho objektu.
-    M - pocet porcii misionara, ktore sa zmestia do hrnca.
-    N - pocet divochov v kmeni (kuchara nepocitame).
+    n_servings - pocet porcii misionara, ktore sa zmestia do hrnca.
+    n_savages - pocet divochov v kmeni (kuchara nepocitame).
 """
-M = 2
-N = 3
+n_servings = 2
+n_savages = 3
 
 
 class SimpleBarrier:
@@ -40,7 +40,7 @@ class SimpleBarrier:
         if self.cnt == self.N:
             self.cnt = 0
             if print_last_thread:
-                print(print_str % (savage_id))
+                print(print_str % savage_id)
             self.sem.signal(self.N)
         self.mutex.unlock()
         self.sem.wait()
@@ -60,8 +60,8 @@ class Shared:
         self.servings = 0
         self.full_pot = Semaphore(0)
         self.empty_pot = Semaphore(0)
-        self.barrier1 = SimpleBarrier(N)
-        self.barrier2 = SimpleBarrier(N)
+        self.barrier1 = SimpleBarrier(n_savages)
+        self.barrier2 = SimpleBarrier(n_savages)
 
 
 def get_serving_from_pot(savage_id, shared):
@@ -158,4 +158,4 @@ def init_and_run(N, M):
 
 
 if __name__ == "__main__":
-    init_and_run(N, M)
+    init_and_run(n_savages, n_servings)
