@@ -11,9 +11,11 @@ Parametre modelu, nie synchronizacie ako takej.
 Preto ich nedavame do zdielaneho objektu.
     n_servings - pocet porcii misionara, ktore sa zmestia do hrnca.
     n_savages - pocet divochov v kmeni (kuchara nepocitame).
+    n_cooks - pocet kucharov
 """
 n_servings = 2
 n_savages = 3
+n_cooks = 3
 
 
 class SimpleBarrier:
@@ -47,7 +49,8 @@ class SimpleBarrier:
 
 
 class Shared:
-    """V tomto pripade musime pouzit zdielanu strukturu.
+    """
+    V tomto pripade musime pouzit zdielanu strukturu.
     Kedze Python struktury nema, pouzijeme triedu bez vlastnych metod.
     Preco musime pouzit strukturu? Lebo chceme zdielat hodnotu
     pocitadla servings, a to jednoduchsie v Pythone asi neurobime.
@@ -57,6 +60,7 @@ class Shared:
 
     def __init__(self):
         self.mutex = Mutex()
+        self.cook_mutex = Mutex()
         self.servings = 0
         self.full_pot = Semaphore(0)
         self.empty_pot = Semaphore(0)
@@ -116,8 +120,6 @@ def savage(savage_id, shared):
 
 def put_servings_in_pot(M, shared):
     """
-    M je pocet porcii, ktore vklada kuchar do hrnca.
-
     Hrniec je reprezentovany zdielanou premennou servings.
     Ta udrziava informaciu o tom, kolko porcii je v hrnci k dispozicii.
     """
@@ -125,7 +127,9 @@ def put_servings_in_pot(M, shared):
     print("kuchar: varim")
     # navarenie jedla tiez cosi trva...
     sleep(0.4 + randint(0, 2) / 10)
+    shared.cook_mutex.lock()
     shared.servings += M
+    shared.cook_mutex.unlock()
 
 
 def cook(M, shared):
@@ -143,7 +147,7 @@ def cook(M, shared):
         shared.full_pot.signal()
 
 
-def init_and_run(N, M):
+def init_and_run(N, M, C):
     """
     Spustenie modelu
     """
@@ -151,11 +155,13 @@ def init_and_run(N, M):
     shared = Shared()
     for savage_id in range(0, N):
         threads.append(Thread(savage, savage_id, shared))
-    threads.append(Thread(cook, M, shared))
+
+    for cook_id in range(0, C):
+        threads.append(Thread(cook, cook_id, shared))
 
     for t in threads:
         t.join()
 
 
 if __name__ == "__main__":
-    init_and_run(n_savages, n_servings)
+    init_and_run(n_savages, n_servings, n_cooks)
