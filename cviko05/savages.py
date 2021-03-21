@@ -88,6 +88,7 @@ def eat(savage_id):
 
 
 def savage(savage_id, shared):
+    i = 0
     while True:
         """
         Pred kazdou hostinou sa divosi musia pockat.
@@ -96,11 +97,12 @@ def savage(savage_id, shared):
         alebo jednu zlozenu, ale kvoli prehladnosti vypisov
         sme sa rozhodli pre toto riesenie.
         """
+        i += 1
         shared.barrier1.wait(
-            f'divoch %2d: prisiel som na veceru, uz nas je %2d',
+            f'divoch %2d: prisiel som na veceru c.{i}, uz nas je %2d',
             savage_id,
             print_each_thread=True)
-        shared.barrier2.wait(f'divoch %2d: uz sme vsetci,',
+        shared.barrier2.wait(f'divoch %2d: uz sme vsetci, vitajte na veceri c.{i}',
                              savage_id,
                              print_last_thread=True)
 
