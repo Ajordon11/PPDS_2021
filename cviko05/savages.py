@@ -99,18 +99,21 @@ def savage(savage_id, shared):
             f'divoch %2d: prisiel som na veceru, uz nas je %2d',
             savage_id,
             print_each_thread=True)
-        shared.barrier2.wait(f'divoch %2d: uz sme vsetci',
+        shared.barrier2.wait(f'divoch %2d: uz sme vsetci,',
                              savage_id,
                              print_last_thread=True)
 
         # Nasleduje klasicke riesenie problemu hodujucich divochov.
         shared.mutex.lock()
+        shared.eating = True
         print("divoch %2d: pocet zostavajucich porcii v hrnci je %2d" %
               (savage_id, shared.servings))
         if shared.servings == 0:
+            shared.eating = False
             print("divoch %2d: budim kuchara" % savage_id)
             shared.empty_pot.signal(n_cooks)
             shared.full_pot.wait()
+            shared.eating = True
         shared.cook_mutex.lock()
         get_serving_from_pot(savage_id, shared)
         shared.cook_mutex.unlock()
@@ -128,7 +131,7 @@ def put_servings_in_pot(cook_id, shared):
     # navarenie jedla tiez cosi trva...
     sleep(0.4 + randint(0, 2) / 10)
     shared.cook_mutex.lock()
-    if shared.servings >= n_servings:
+    if shared.servings >= n_servings or shared.eating:
         print(f'kuchar {cook_id}: vidi ze uz je plno a jedia, tak ide prec')
         shared.cook_mutex.unlock()
         return
@@ -149,7 +152,7 @@ def cook(id,  shared):
     while True:
         shared.empty_pot.wait()
         put_servings_in_pot(id, shared)
-        if shared.servings == n_servings:
+        if shared.servings == n_servings and not shared.eating:
             print(f'kuchar {id}: vidi ze hrniec je plny a vola divochov')
             shared.full_pot.signal()
         else:
