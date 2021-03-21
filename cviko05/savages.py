@@ -135,7 +135,7 @@ def put_servings_in_pot(cook_id, max, shared):
     sleep(0.4 + randint(0, 2) / 10)
     shared.cook_mutex.lock()
     if shared.servings >= max or shared.eating:
-        print(f'kuchar {cook_id}: vidi ze uz je plno a jedia, tak ide prec')
+        print(f'kuchar {cook_id}: vidi ze uz je plno a jedia, tak ho zje sam')
         shared.cook_mutex.unlock()
         return
     shared.servings += 1
