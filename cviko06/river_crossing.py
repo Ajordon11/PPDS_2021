@@ -1,4 +1,21 @@
-from fei.ppds import Mutex, Semaphore, Thread
+from fei.ppds import Mutex, Semaphore, Thread, print
+
+
+class SimpleBarrier:
+    def __init__(self, size):
+        self.size = size
+        self.mutex = Mutex()
+        self.turnstile = Semaphore(0)
+        self.cnt = 0
+
+    def wait(self):
+        self.mutex.lock()
+        self.cnt += 1
+        if self.cnt == self.size:
+            self.cnt = 0
+            self.turnstile.signal(self.size)
+        self.mutex.unlock()
+        self.turnstile.wait()
 
 
 class Shared:
@@ -8,6 +25,7 @@ class Shared:
         self.mutex = Mutex()
         self.police_sem = Semaphore(0)
         self.criminals_sem = Semaphore(0)
+        self.barrier = SimpleBarrier(4)
 
 
 def board():
@@ -18,11 +36,11 @@ def row_boat():
     pass
 
 
-def police(id):
+def police(id, shared):
     pass
 
 
-def criminal(id):
+def criminal(id, shared):
     pass
 
 
