@@ -21,10 +21,10 @@ class SimpleBarrier:
 class Shared:
     def __init__(self):
         self.police_count = 0
-        self.criminals_count = 0
+        self.criminal_count = 0
         self.mutex = Mutex()
         self.police_sem = Semaphore(0)
-        self.criminals_sem = Semaphore(0)
+        self.criminal_sem = Semaphore(0)
         self.barrier = SimpleBarrier(4)
 
 
@@ -37,11 +37,71 @@ def row_boat():
 
 
 def police(id, shared):
-    pass
+    isCaptain = False
+    while True:
+        shared.mutex.lock()
+        shared.police_count += 1
+        print(f'Policeman {id} ready to board.')
+
+        if shared.police_count == 4:
+            isCaptain = True
+            shared.police_count = 0
+            shared.police_sem.signal(4)
+
+        elif shared.police_count == 2 and shared.criminal_count == 2:
+            isCaptain = True
+            shared.police_count = 0
+            shared.police_sem.signal(2)
+
+            shared.criminal_count -= 2
+            shared.criminal_sem.signal(2)
+
+        else:
+            shared.mutex.unlock()
+
+        shared.police_sem.wait()
+        print(f'Policeman {id} is boarding the ship.')
+        board()
+        shared.barrier.wait()
+
+        if isCaptain:
+            print(f'Policeman {id} is the captain of this cruise.')
+            row_boat()
+            shared.mutex.unlock()
 
 
 def criminal(id, shared):
-    pass
+    isCaptain = False
+    while True:
+        shared.mutex.lock()
+        shared.criminal_count += 1
+        print(f'Criminal {id} ready to board.')
+
+        if shared.criminal_count == 4:
+            isCaptain = True
+            shared.criminal_count = 0
+            shared.criminal_sem.signal(4)
+
+        elif shared.police_count == 2 and shared.criminal_count == 2:
+            isCaptain = True
+            shared.criminal_count = 0
+            shared.criminal_sem.signal(2)
+
+            shared.police_count -= 2
+            shared.police_sem.signal(2)
+
+        else:
+            shared.mutex.unlock()
+
+        shared.criminal_sem.wait()
+        print(f'Criminal {id} is boarding the ship.')
+        board()
+        shared.barrier.wait()
+
+        if isCaptain:
+            print(f'Criminal {id} is the captain of this cruise.')
+            row_boat()
+            shared.mutex.unlock()
 
 
 if __name__ == '__main__':
