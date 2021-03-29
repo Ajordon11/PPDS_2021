@@ -48,9 +48,9 @@ def row_boat(crew, captain, shared):
 
 
 def police(id, shared):
-    isCaptain = False
     crew = ''
     while True:
+        isCaptain = False
         shared.mutex.wait()
         shared.police_count += 1
         print(f'Policeman {id} ready to board the ship.')
@@ -67,7 +67,6 @@ def police(id, shared):
 
             shared.police_count = 0
             shared.criminal_count -= 2
-
             isCaptain = True
             crew = 'mixed'
 
@@ -86,9 +85,9 @@ def police(id, shared):
 
 
 def criminal(id, shared):
-    isCaptain = False
     crew = ''
     while True:
+        isCaptain = False
         shared.mutex.wait()
         shared.criminal_count += 1
         print(f'Criminal {id} ready to board the ship.')
