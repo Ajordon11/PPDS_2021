@@ -56,19 +56,19 @@ def police(id, shared):
         print(f'Policeman {id} ready to board the ship.')
 
         if shared.police_count == 4:
-            isCaptain = True
-            shared.police_count = 0
             shared.police_sem.signal(4)
+            shared.police_count = 0
+            isCaptain = True
             crew = 'only police'
 
-        elif shared.police_count == 2 and shared.criminal_count == 2:
-            isCaptain = True
-            shared.police_count = 0
+        elif shared.police_count == 2 and shared.criminal_count >= 2:
             shared.police_sem.signal(2)
-
-            shared.criminal_count -= 2
             shared.criminal_sem.signal(2)
 
+            shared.police_count = 0
+            shared.criminal_count -= 2
+
+            isCaptain = True
             crew = 'mixed'
 
         else:
@@ -94,19 +94,19 @@ def criminal(id, shared):
         print(f'Criminal {id} ready to board the ship.')
 
         if shared.criminal_count == 4:
-            isCaptain = True
-            shared.criminal_count = 0
             shared.criminal_sem.signal(4)
+            shared.criminal_count = 0
+            isCaptain = True
             crew = 'only criminals'
 
-        elif shared.police_count == 2 and shared.criminal_count == 2:
-            isCaptain = True
-            shared.criminal_count = 0
+        elif shared.police_count >= 2 and shared.criminal_count == 2:
             shared.criminal_sem.signal(2)
-
-            shared.police_count -= 2
             shared.police_sem.signal(2)
 
+            shared.criminal_count = 0
+            shared.police_count -= 2
+
+            isCaptain = True
             crew = 'mixed'
 
         else:
