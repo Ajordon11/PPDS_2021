@@ -1,3 +1,12 @@
+"""
+Cvicenie 06 - River Crossing problem
+    - bariera, ktora povoluje prechod vlaknam len v urcitych kombinaciach
+    (v tomto pripade 2+2 alebo 4+0, 0+4)
+    - ak moze vlakno nastupit do lode, zavola funkciu board()
+    - 4. vlakno, ktore nastupi do lode je kapitanom a zavola row_boat()
+    (nezalezi na tom, ci je to policajt (=serf) alebo kriminalnik (=hacker))
+"""
+
 from time import sleep
 
 from fei.ppds import Mutex, Semaphore, Thread, print, randint
