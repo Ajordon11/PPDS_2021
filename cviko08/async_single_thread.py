@@ -20,12 +20,15 @@ async def task_get_dog(work_queue, tab_queue):
 
 async def task_open_tab(work_queue, open_tab=False):
     async with aiohttp.ClientSession() as session:
+        # wait for first url in queue
+        while work_queue.qsize() == 0:
+            await asyncio.sleep(0.1)
         while not work_queue.empty():
             url = await work_queue.get()
             print(f'Opening tab, URL: {url}')
             time_start = time.perf_counter()
             async with session.get(url) as response:
-                await response.read()
+                await response.release()
             if open_tab:
                 webbrowser.get('chrome').open(url)
             elapsed = time.perf_counter() - time_start
@@ -46,7 +49,7 @@ async def main():
     start_time = time.perf_counter()
     await asyncio.gather(
         task_get_dog(dog_queue, tab_queue),
-        task_open_tab(tab_queue, True),
+        task_open_tab(tab_queue, False),
     )
     elapsed = time.perf_counter() - start_time
     print(f'\nTotal elapsed time: {elapsed:.1f}')
