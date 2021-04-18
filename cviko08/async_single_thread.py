@@ -42,7 +42,7 @@ async def main():
     dog_queue = asyncio.Queue()
     tab_queue = asyncio.Queue()
 
-    for _ in range(5):
+    for _ in range(20):
         await dog_queue.put(default_url)
 
     # Run the tasks

@@ -37,7 +37,7 @@ def main():
     dog_queue = queue.Queue()
     tab_queue = queue.Queue()
 
-    for _ in range(5):
+    for _ in range(20):
         dog_queue.put(default_url)
     tasks = [task_get_dog(dog_queue, tab_queue), task_open_tab(tab_queue, False)]
 
